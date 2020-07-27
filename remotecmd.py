@@ -27,21 +27,37 @@ class server(object):
 		print(make_colors("Listen On:", 'lc') + make_colors(host, 'lw','bl') + ":" + make_colors(str(port), 'lw','lr'))
 		try:
 			s.bind((host, port))
-			
+			exit = False
 			while 1:
 				data, address = s.recvfrom(8096)
+				if data == 'exit':
+					exit = True
+					try:
+						sys.exit()
+					except:
+						pass
+				if exit:
+					break
 				debug(data = data)
 				debug(address = address)
 				#a = os.system(data)
-				process = subprocess.Popen(data, stdout = subprocess.PIPE)
-				#(out, err) = process.communicate()
-				out = process.stdout
-				print("dir(out) =", dir(out))
-				err = process.stderr
-				print("OUT SERVER =", out.read())
-				debug(out = out.read(), debug = True)
-				debug(err = err)
-				s.sendto(str(out), address)
+				try:
+					process = subprocess.Popen(data, stdout = subprocess.PIPE)
+					#(out, err) = process.communicate()
+					out = process.stdout
+					#print("out =", out.read())
+					#print("dir(out) =", dir(out))
+					err = process.stderr
+					print("OUT SERVER =", out.read())
+					debug(out = out.read())
+					debug(err = err)
+					try:
+						err = err.read()
+					except:
+						pass
+					s.sendto(str([str(out.read()), str(err)]), address)
+				except:
+					os.system(data)
 				#if a > 0:
 				#	print(make_colors("ERROR", 'lw','lr',['blink']))
 		except:
@@ -68,16 +84,21 @@ class client(object):
 		s.sendto(data, (host, port))
 		try:
 			data, server = s.recvfrom(8096)
-			debug(data = data, debug = True)
+			debug(data = data)
 			#data = ast.literal_eval(data)
 			print("OUTPUT =", data)
 			#print("ERROR  =", data[1])
+			#s.close()
+			try:
+				sys.exit()
+			except:
+				pass
 		except:
 			import traceback
 			traceback.format_exc()
 			print("NO DATA !")
-		finally:
-			s.close()
+		#finally:
+		#	s.close()
 	
 	
 def usage():
