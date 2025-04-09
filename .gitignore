@@ -12,3 +12,4 @@
 *.egg-info/
 traceback.log
 __pycache__/
+*.orig
